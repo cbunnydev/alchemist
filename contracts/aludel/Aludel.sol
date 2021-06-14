@@ -61,6 +61,7 @@ interface IAludel is IRageQuit {
     struct StakeData {
         uint256 amount;
         uint256 timestamp;
+        uint256 pausedDuration;
     }
 
     struct RewardScaling {
@@ -879,7 +880,7 @@ contract Aludel is IAludel, Powered, Ownable {
         _updateTotalStakeUnits();
 
         // store amount and timestamp
-        vaultData.stakes.push(StakeData(amount, block.timestamp));
+        vaultData.stakes.push(StakeData(amount, block.timestamp, getTotalDuration()));
 
         // update cached total vault and Aludel amounts
         vaultData.totalStake = vaultData.totalStake.add(amount);

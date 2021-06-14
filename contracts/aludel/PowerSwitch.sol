@@ -33,6 +33,7 @@ interface IPowerSwitch {
     function getStatus() external view returns (State status);
 
     function getPowerController() external view returns (address controller);
+
 }
 
 /// @title PowerSwitch
@@ -41,7 +42,8 @@ contract PowerSwitch is IPowerSwitch, Ownable {
     /* storage */
 
     IPowerSwitch.State private _status;
-
+    uint256 public _totalPausedDuration;
+    uint256 public _pausedTimestamp;
     /* initializer */
 
     constructor(address owner) {
@@ -49,6 +51,8 @@ contract PowerSwitch is IPowerSwitch, Ownable {
         require(owner != address(0), "PowerSwitch: invalid owner");
         // transfer ownership
         Ownable.transferOwnership(owner);
+        _totalPausedDuration = 0;
+        _pausedTimestamp = 0;
     }
 
     /* admin functions */
@@ -61,6 +65,7 @@ contract PowerSwitch is IPowerSwitch, Ownable {
     function powerOn() external override onlyOwner {
         require(_status == IPowerSwitch.State.Offline, "PowerSwitch: cannot power on");
         _status = IPowerSwitch.State.Online;
+        _pausedTimestamp = block.timestamp;
         emit PowerOn();
     }
 
@@ -72,6 +77,7 @@ contract PowerSwitch is IPowerSwitch, Ownable {
     function powerOff() external override onlyOwner {
         require(_status == IPowerSwitch.State.Online, "PowerSwitch: cannot power off");
         _status = IPowerSwitch.State.Offline;
+        _totalPausedDuration += block.timestamp - _pausedTimestamp;
         emit PowerOff();
     }
 
@@ -109,4 +115,5 @@ contract PowerSwitch is IPowerSwitch, Ownable {
     function getPowerController() external view override returns (address controller) {
         return Ownable.owner();
     }
+
 }

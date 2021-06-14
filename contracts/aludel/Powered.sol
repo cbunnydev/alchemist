@@ -13,6 +13,8 @@ interface IPowered {
     function getPowerSwitch() external view returns (address powerSwitch);
 
     function getPowerController() external view returns (address controller);
+
+    function getTotalDuration() external view returns (uint256 powerDuration);
 }
 
 /// @title Powered
@@ -70,6 +72,10 @@ contract Powered is IPowered {
 
     function getPowerController() public view override returns (address controller) {
         return IPowerSwitch(_powerSwitch).getPowerController();
+    }
+
+    function getTotalDuration() public view override returns (uint256 totalDuration) {
+        return IPowerSwitch(_powerSwitch)._totalPausedDuration;
     }
 
     /* convenience functions */
